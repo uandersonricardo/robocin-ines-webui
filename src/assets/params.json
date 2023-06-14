@@ -1,0 +1,50 @@
+{
+  "modules": [
+    {
+      "name": "VisionBase",
+      "parameters": [
+        {
+          "name": "IP",
+          "description": "IP do serviço",
+          "type": "Input",
+          "value": "",
+          "details": {
+            "regex": "^[0-9.]*$"
+          }
+        },
+        {
+          "name": "Porta",
+          "description": "Porta do serviço",
+          "type": "Input",
+          "value": "",
+          "details": {
+            "regex": "^[0-9]*$"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AutoReferee",
+      "parameters": [
+        {
+          "name": "IP",
+          "description": "IP do serviço",
+          "type": "Input",
+          "value": "",
+          "details": {
+            "regex": "^[0-9.]*$"
+          }
+        },
+        {
+          "name": "Porta",
+          "description": "Porta do serviço",
+          "type": "Input",
+          "value": "",
+          "details": {
+            "regex": "^[0-9]*$"
+          }
+        }
+      ]
+    }
+  ]
+}
