@@ -39,6 +39,7 @@ module.exports = {
     "react-refresh/only-export-components": "warn",
     "prettier/prettier": ["error"],
     "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error"
+    "simple-import-sort/exports": "error",
+    "react/prop-types": "off"
   }
 };

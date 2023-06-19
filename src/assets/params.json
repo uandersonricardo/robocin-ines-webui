@@ -1,7 +1,7 @@
 {
   "modules": [
     {
-      "name": "VisionBase",
+      "name": "Vision",
       "parameters": [
         {
           "name": "IP",
@@ -24,7 +24,7 @@
       ]
     },
     {
-      "name": "AutoReferee",
+      "name": "Referee",
       "parameters": [
         {
           "name": "IP",
