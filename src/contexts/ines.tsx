@@ -1,6 +1,8 @@
 import React, { createContext, ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import useWebSocket from "react-use-websocket";
 
+import { convertTimestampToDate } from "@/utils/time";
+
 export interface InesContextProps {
   field: Field | null;
   setField: React.Dispatch<React.SetStateAction<Field | null>>;
@@ -184,6 +186,7 @@ export const InesProvider: React.FC<InesProviderProps> = ({ children }) => {
   });
 
   const togglePlay = () => {
+    lastTimestamp.current = Date.now();
     setIsPlaying((isPlaying) => !isPlaying);
   };
 
@@ -224,19 +227,25 @@ export const InesProvider: React.FC<InesProviderProps> = ({ children }) => {
         setField(sample.data);
       }
 
-      const diff = Date.parse(buffer[nextSample + 1].createdAt) - Date.parse(sample.createdAt);
-      const now = Date.now();
-      const elapsed = now - lastTimestamp.current;
-      lastTimestamp.current = now;
-
       window.requestAnimationFrame(() => {
-        if (elapsed >= diff) {
-          setNextSample((nextSample) => nextSample + 1);
-        } else {
-          setTimeout(() => {
-            setNextSample((nextSample) => nextSample + 1);
-          }, diff - elapsed);
+        const now = Date.now();
+        const elapsed = now - lastTimestamp.current;
+
+        let offset = 1;
+        while (nextSample + offset < buffer.length) {
+          const possibleNextSample = buffer[nextSample + offset];
+          const sampleElapsed =
+            convertTimestampToDate(possibleNextSample.data.timestamp).getTime() -
+            convertTimestampToDate(sample.data.timestamp).getTime();
+          if (sampleElapsed < elapsed) {
+            offset++;
+          } else {
+            break;
+          }
         }
+
+        lastTimestamp.current = now;
+        setNextSample((nextSample) => nextSample + offset);
       });
     } else {
       setIsPlaying(false);
