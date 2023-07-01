@@ -80,4 +80,12 @@ type Match = {
   duration: number;
 };
 
-type Chunk = any[];
+type Sample = {
+  _id: string;
+  matchId: string;
+  type: "status" | "frame" | "field";
+  data: any;
+  createdAt: string;
+};
+
+type Chunk = Sample[];

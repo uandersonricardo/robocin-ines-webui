@@ -11,12 +11,12 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { RiPlayFill, RiStopFill } from "react-icons/ri";
-import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 
-import { InesContext } from "@/contexts/ines";
-import { convertTimestampToDate, formatSeconds } from "@/utils/time";
+import socketIo from "@/services/socketio";
+import useInesStore from "@/stores/useInesStore";
+import { formatSeconds } from "@/utils/time";
 
 import CField from "../components/CField";
 import CSidebarStatus from "../components/CSidebarStatus";
@@ -26,13 +26,31 @@ const CLive: React.FC = () => {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipTime, setTooltipTime] = useState(0);
-  const { match, frame, isPlaying, isLive, togglePlay, toggleLive } = useContext(InesContext);
+  const {
+    match,
+    isPlaying,
+    isLive,
+    togglePlay,
+    toggleLive,
+    clearBuffer,
+    setIsFetching,
+    bufferCurrentDate,
+    setBufferCurrentDate,
+  } = useInesStore((state) => ({
+    match: state.match,
+    frame: state.frame,
+    isPlaying: state.isPlaying,
+    isLive: state.isLive,
+    togglePlay: state.togglePlay,
+    toggleLive: state.toggleLive,
+    clearBuffer: state.clearBuffer,
+    setIsFetching: state.setIsFetching,
+    bufferCurrentDate: state.bufferCurrentDate,
+    setBufferCurrentDate: state.setBufferCurrentDate,
+  }));
 
-  const lastJsonMessage: any = null;
   const current =
-    frame && match
-      ? Math.round((convertTimestampToDate(frame.timestamp).getTime() - match.startedAt.getTime()) / 1000)
-      : 0;
+    bufferCurrentDate && match ? Math.round((bufferCurrentDate.getTime() - match.startedAt.getTime()) / 1000) : 0;
   const max = match ? Math.round(match.duration / 1000) : current;
 
   const onMouseEnter = () => {
@@ -53,6 +71,24 @@ const CLive: React.FC = () => {
     setShowTooltip(false);
   };
 
+  const onClick = () => {
+    if (isLive) {
+      toggleLive();
+    }
+
+    if (isPlaying) {
+      togglePlay();
+    }
+
+    const selectedDate = match ? new Date(match.startedAt.getTime() + tooltipTime * 1000) : null;
+    const lastTimestamp = selectedDate?.toISOString() || null;
+
+    clearBuffer();
+    setBufferCurrentDate(selectedDate);
+    setIsFetching(true);
+    socketIo.send({ command: "get-chunk", lastTimestamp: lastTimestamp });
+  };
+
   return (
     <TabPanel display="flex" flexDirection="row" p="0" flex="1">
       <CSidebarParams />
@@ -70,6 +106,7 @@ const CLive: React.FC = () => {
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
                 onMouseMove={onMouseMove}
+                onClick={onClick}
               >
                 <SliderFilledTrack bg="red.500" />
               </SliderTrack>

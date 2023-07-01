@@ -14,13 +14,13 @@ import {
   Select,
   Text,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React from "react";
 import { RiArrowDownSLine, RiRobotFill, RiTimeFill } from "react-icons/ri";
 
-import { InesContext } from "@/contexts/ines";
+import useInesStore from "@/stores/useInesStore";
 
 const CSidebarStatus: React.FC = () => {
-  const { status } = useContext(InesContext);
+  const { status } = useInesStore((state) => ({ status: state.status }));
 
   return (
     <Flex direction="column" bg="gray.900" borderLeft="1px" borderColor="gray.700" color="white" h="full" minW="60">
