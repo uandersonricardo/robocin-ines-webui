@@ -38,7 +38,6 @@ const CLive: React.FC = () => {
     setBufferCurrentDate,
   } = useInesStore((state) => ({
     match: state.match,
-    frame: state.frame,
     isPlaying: state.isPlaying,
     isLive: state.isLive,
     togglePlay: state.togglePlay,

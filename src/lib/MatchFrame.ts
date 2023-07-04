@@ -7,23 +7,25 @@ class MatchFrame {
   private ctx: CanvasRenderingContext2D;
   private scaleParams: ScaleParams;
 
-  constructor(frame: Frame, field: Field, ctx: CanvasRenderingContext2D) {
+  constructor(frame: Frame, ctx: CanvasRenderingContext2D) {
     this.frame = frame;
-    this.field = field;
+    this.field = frame.field;
     this.ctx = ctx;
     this.canvas = ctx.canvas;
-    this.scaleParams = extractScaleParams(field, this.canvas.clientWidth, this.canvas.clientHeight);
+    this.scaleParams = extractScaleParams(this.field, this.canvas.clientWidth, this.canvas.clientHeight);
   }
 
   public draw() {
     this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
 
     // Draw field
-    this.drawBackground();
-    this.drawGoals();
-    this.drawPenaltyAreas();
-    this.drawGoalCenterToPenaltyMark();
-    this.drawMiddleLine();
+    if (this.field) {
+      this.drawBackground();
+      this.drawGoals();
+      this.drawPenaltyAreas();
+      this.drawGoalCenterToPenaltyMark();
+      this.drawMiddleLine();
+    }
 
     // Draw frame
     this.drawRobots();
@@ -121,6 +123,10 @@ class MatchFrame {
   }
 
   private drawBall() {
+    if (!this.frame.ball.position) {
+      return;
+    }
+
     const { centerShiftX, centerShiftY, ratio } = this.scaleParams;
 
     this.ctx.fillStyle = "#F68A0F";
@@ -136,12 +142,8 @@ class MatchFrame {
   }
 
   private drawRobots() {
-    this.frame.teammates.forEach((robot) => {
-      this.drawRobot(robot, "#0000FF");
-    });
-
-    this.frame.opponents.forEach((robot) => {
-      this.drawRobot(robot, "#FF0000");
+    this.frame.robots.forEach((robot) => {
+      this.drawRobot(robot, robot.color === "COLOR_BLUE" ? "#0000FF" : "#FFFF00");
     });
   }
 

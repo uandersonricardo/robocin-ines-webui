@@ -10,8 +10,7 @@ const CField: React.FC = () => {
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
 
-  const { field, frame, isFetching, buffer, nextSample, isPlaying, isLive } = useInesStore((state) => ({
-    field: state.field,
+  const { frame, isFetching, buffer, nextSample, isPlaying, isLive } = useInesStore((state) => ({
     frame: state.frame,
     isFetching: state.isFetching,
     buffer: state.buffer,
@@ -53,14 +52,7 @@ const CField: React.FC = () => {
           <Spinner size="md" color="white" thickness="4px" />
         </Flex>
       )}
-      <CCanvas
-        canvasWidth={width}
-        canvasHeight={height}
-        field={field}
-        frame={frame}
-        zoomAndPan={false}
-        isPlaying={isPlaying}
-      />
+      <CCanvas canvasWidth={width} canvasHeight={height} frame={frame} zoomAndPan={false} isPlaying={isPlaying} />
     </Flex>
   );
 };

@@ -4,125 +4,136 @@ import { create } from "zustand";
 import socketIo from "@/services/socketio";
 import { convertTimestampToDate } from "@/utils/time";
 
-const fieldDefault: Field = {
-  id: "340",
-  timestamp: { seconds: "1685230447", nanos: 356585870 },
-  length: 9000,
-  width: 6000,
-  goalDepth: 180,
-  goalWidth: 1000,
-  penaltyAreaDepth: 1000,
-  penaltyAreaWidth: 2000,
-  goalCenterToPenaltyMark: 6000,
-};
-
-const statusDefault: Status = {
-  id: "78194",
-  timestamp: { seconds: "1685224289", nanos: 450631402 },
-  eventTimestamp: { seconds: "1685224289", nanos: 416736667 },
-  homeTeam: {
-    name: "Home",
-    score: 3,
-    yellowCards: 4,
-    redCards: 7,
+const refereeDefault: Referee = {
+  packetTimestamp: "1688418444652110",
+  stage: "NORMAL_FIRST_HALF",
+  stageTimeLeft: -168598893,
+  command: "DIRECT_FREE_YELLOW",
+  commandCounter: 35,
+  commandTimestamp: "1688418378669568",
+  yellow: {
+    name: "Unknown",
+    score: 0,
+    redCards: 0,
+    yellowCards: 0,
     timeouts: 4,
-    goalkeeperId: 4,
+    timeoutTime: 300000000,
+    goalkeeper: 0,
+    foulCounter: 0,
+    ballPlacementFailures: 1,
+    canPlaceBall: true,
+    maxAllowedBots: 11,
+    botSubstitutionIntent: false,
+    ballPlacementFailuresReached: false,
   },
-  awayTeam: {
-    name: "Away",
-    score: 5,
-    yellowCards: 1,
-    redCards: 1,
-    timeouts: 6,
-    goalkeeperId: 3,
+  blue: {
+    name: "Unknown",
+    score: 0,
+    redCards: 0,
+    yellowCards: 0,
+    timeouts: 4,
+    timeoutTime: 300000000,
+    goalkeeper: 0,
+    foulCounter: 0,
+    ballPlacementFailures: 2,
+    canPlaceBall: true,
+    maxAllowedBots: 11,
+    botSubstitutionIntent: false,
+    ballPlacementFailuresReached: false,
   },
-  command: { awayPrepareDirectFreeKick: {} },
-  totalCommands: "78194",
+  blueTeamOnPositiveHalf: false,
+  currentActionTimeRemaining: -61005317,
 };
 
 const frameDefault: Frame = {
-  id: "51941",
-  timestamp: { seconds: "1685230497", nanos: 586992841 },
-  ball: {
-    position: { x: 739.41162109375, y: 577.985595703125 },
-    velocity: {},
+  serialId: "10627",
+  timestamp: { seconds: "1688418369", nanos: 294762142 },
+  ball: { position: { x: -4296.9990234375, y: -2002.876220703125 } },
+  robots: [
+    {
+      color: "COLOR_YELLOW",
+      id: 0,
+      position: { x: 4383.46875, y: -480.4874572753906 },
+      angle: -2.9563443660736084,
+    },
+    {
+      color: "COLOR_YELLOW",
+      id: 1,
+      position: { x: 3502.136474609375, y: 276.7312316894531 },
+      angle: -3.1486153602600098,
+    },
+    {
+      color: "COLOR_YELLOW",
+      id: 2,
+      position: { x: 3503.28369140625, y: 74.65524291992188 },
+      angle: -3.1445209980010986,
+    },
+    {
+      color: "COLOR_YELLOW",
+      id: 3,
+      position: { x: -4168.1669921875, y: -1231.083740234375 },
+      angle: -1.9438886642456055,
+    },
+    {
+      color: "COLOR_YELLOW",
+      id: 4,
+      position: { x: 3506.04541015625, y: -325.93011474609375 },
+      angle: -3.128216505050659,
+    },
+    {
+      color: "COLOR_YELLOW",
+      id: 5,
+      position: { x: 3496.387451171875, y: -125.30268859863281 },
+      angle: -3.1513712406158447,
+    },
+    {
+      color: "COLOR_BLUE",
+      id: 0,
+      position: { x: -4389.2998046875, y: -473.5303955078125 },
+      angle: -1.3025133609771729,
+    },
+    {
+      color: "COLOR_BLUE",
+      id: 1,
+      position: { x: 4403.2939453125, y: -2713.709228515625 },
+      angle: 0.009040290489792824,
+    },
+    {
+      color: "COLOR_BLUE",
+      id: 2,
+      position: { x: 4051.005859375, y: -2768.968017578125 },
+      angle: -0.013796268962323666,
+    },
+    {
+      color: "COLOR_BLUE",
+      id: 3,
+      position: { x: 3649.112060546875, y: -2779.2060546875 },
+      angle: 0.0011148236226290464,
+    },
+    {
+      color: "COLOR_BLUE",
+      id: 4,
+      position: { x: 3754.6767578125, y: 2444.726806640625 },
+      angle: -0.009620285592973232,
+    },
+    {
+      color: "COLOR_BLUE",
+      id: 5,
+      position: { x: 4119.0224609375, y: 2373.950439453125 },
+      angle: 0.008717612363398075,
+    },
+  ],
+  field: {
+    serialId: "10627",
+    length: 9000,
+    width: 6000,
+    goalDepth: 180,
+    goalWidth: 1000,
+    penaltyAreaDepth: 1000,
+    penaltyAreaWidth: 2000,
+    boundaryWidth: 300,
+    goalCenterToPenaltyMark: 6000,
   },
-  teammates: [
-    {
-      id: 0,
-      position: { x: -379.94775390625, y: 2329.96826171875 },
-      angle: 0.14654088020324707,
-      velocity: {},
-    },
-    {
-      id: 1,
-      position: { x: 3396.458984375, y: 1777.26220703125 },
-      angle: -0.9127233028411865,
-      velocity: {},
-    },
-    {
-      id: 2,
-      position: { x: 2325.115234375, y: 1009.333740234375 },
-      angle: -0.6630275249481201,
-      velocity: {},
-    },
-    {
-      id: 3,
-      position: { x: 2917.86572265625, y: 1244.2578125 },
-      angle: 1.8898046016693115,
-      velocity: {},
-    },
-    {
-      id: 4,
-      position: { x: 519.9052734375, y: -1570.924560546875 },
-      angle: 1.4593055248260498,
-      velocity: {},
-    },
-    {
-      id: 5,
-      position: { x: -49.9052734375, y: 2537.5390625 },
-      angle: -1.381974220275879,
-      velocity: {},
-    },
-  ],
-  opponents: [
-    {
-      id: 0,
-      position: { x: -2437.054443359375, y: -739.777587890625 },
-      angle: -2.177166223526001,
-      velocity: {},
-    },
-    {
-      id: 1,
-      position: { x: -2820.148193359375, y: 2489.7177734375 },
-      angle: 1.7385351657867432,
-      velocity: {},
-    },
-    {
-      id: 2,
-      position: { x: -1618.7919921875, y: -1680.46826171875 },
-      angle: 2.741132974624634,
-      velocity: {},
-    },
-    {
-      id: 3,
-      position: { x: -1847.983642578125, y: -311.767822265625 },
-      angle: 0.6097686290740967,
-      velocity: {},
-    },
-    {
-      id: 4,
-      position: { x: 802.8017578125, y: -759.547119140625 },
-      angle: 2.5677597522735596,
-      velocity: {},
-    },
-    {
-      id: 5,
-      position: { x: 676.626953125, y: -1743.532470703125 },
-      angle: 0.13201379776000977,
-      velocity: {},
-    },
-  ],
 };
 
 const BUFFER_SIZE = 10000;
@@ -132,8 +143,7 @@ let lastTimestamp = Date.now();
 
 type State = {
   webSocket: WebSocketLike | null;
-  field: Field | null;
-  status: Status | null;
+  referee: Referee | null;
   frame: Frame | null;
   match: Match | null;
   buffer: Chunk;
@@ -143,8 +153,7 @@ type State = {
   isFetching: boolean;
   bufferCurrentDate: Date | null;
   setWebSocket: (webSocket: WebSocketLike | null) => void;
-  setField: (field: Field) => void;
-  setStatus: (status: Status) => void;
+  setReferee: (referee: Referee) => void;
   setFrame: (frame: Frame) => void;
   setMatch: (match: Match) => void;
   clearBuffer: () => void;
@@ -159,8 +168,7 @@ type State = {
 
 const useInesStore = create<State>((set, get) => ({
   webSocket: null,
-  field: fieldDefault,
-  status: statusDefault,
+  referee: refereeDefault,
   frame: frameDefault,
   match: null,
   buffer: [],
@@ -170,8 +178,7 @@ const useInesStore = create<State>((set, get) => ({
   isFetching: false,
   bufferCurrentDate: null,
   setWebSocket: (webSocket: WebSocketLike | null) => set({ webSocket }),
-  setField: (field: Field) => set({ field }),
-  setStatus: (status: Status) => set({ status }),
+  setReferee: (referee: Referee) => set({ referee }),
   setFrame: (frame: Frame) => set({ frame }),
   setMatch: (match: Match) => set({ match }),
   clearBuffer: () => set({ buffer: [], nextSample: 0 }),
@@ -295,17 +302,20 @@ const useInesStore = create<State>((set, get) => ({
       stateChanges[sample.type] = sample.data;
     }
 
-    const bufferCurrentDate = sample.data.timestamp
-      ? convertTimestampToDate(sample.data.timestamp)
-      : new Date(sample.createdAt);
+    let bufferCurrentDate: Date | null = null;
+
+    if (sample.type === "frame") {
+      bufferCurrentDate = convertTimestampToDate(sample.data.timestamp);
+    }
 
     set((state) => ({
       ...stateChanges,
-      bufferCurrentDate,
-      match: state.match && {
-        ...state.match,
-        duration: bufferCurrentDate.getTime() - state.match.startedAt.getTime(),
-      },
+      bufferCurrentDate: bufferCurrentDate || state.bufferCurrentDate,
+      match: bufferCurrentDate &&
+        state.match && {
+          ...state.match,
+          duration: bufferCurrentDate.getTime() - state.match.startedAt.getTime(),
+        },
     }));
   },
 }));
