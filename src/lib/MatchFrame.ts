@@ -23,7 +23,7 @@ class MatchFrame {
       this.drawBackground();
       this.drawGoals();
       this.drawPenaltyAreas();
-      this.drawGoalCenterToPenaltyMark();
+      // this.drawGoalCenterToPenaltyMark();
       this.drawMiddleLine();
     }
 
@@ -33,28 +33,33 @@ class MatchFrame {
   }
 
   private drawBackground() {
-    const { centerShiftX, centerShiftY, width, height } = this.scaleParams;
+    const { centerShiftX, centerShiftY, width, height, usableHeight, usableWidth, ratio } = this.scaleParams;
 
     this.ctx.fillStyle = "#056D0B";
     this.ctx.strokeStyle = "#FFFFFF";
     this.ctx.lineWidth = 3;
 
-    this.ctx.fillRect(centerShiftX, centerShiftY, width, height);
-    this.ctx.strokeRect(centerShiftX, centerShiftY, width, height);
+    this.ctx.fillRect(
+      centerShiftX - this.field.boundaryWidth * ratio,
+      centerShiftY - this.field.boundaryWidth * ratio,
+      width,
+      height,
+    );
+    this.ctx.strokeRect(centerShiftX, centerShiftY, usableWidth, usableHeight);
   }
 
   private drawGoals() {
     const { centerShiftX, centerShiftY, ratio } = this.scaleParams;
 
     this.ctx.strokeRect(
-      centerShiftX + (this.field.length - this.field.goalDepth) * ratio,
+      centerShiftX + this.field.length * ratio,
       centerShiftY + ((this.field.width - this.field.goalWidth) / 2) * ratio,
       this.field.goalDepth * ratio,
       this.field.goalWidth * ratio,
     );
 
     this.ctx.strokeRect(
-      centerShiftX,
+      centerShiftX - this.field.goalDepth * ratio,
       centerShiftY + ((this.field.width - this.field.goalWidth) / 2) * ratio,
       this.field.goalDepth * ratio,
       this.field.goalWidth * ratio,
@@ -123,7 +128,7 @@ class MatchFrame {
   }
 
   private drawBall() {
-    if (!this.frame.ball.position) {
+    if (!this.frame.ball?.position) {
       return;
     }
 

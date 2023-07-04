@@ -231,8 +231,9 @@ const useInesStore = create<State>((set, get) => ({
         while (nextSample + offset < buffer.length - 1) {
           const possibleNextSample = buffer[nextSample + offset];
           const sampleElapsed =
-            convertTimestampToDate(possibleNextSample.data.timestamp).getTime() -
-            convertTimestampToDate(sample.data.timestamp).getTime();
+            convertTimestampToDate(
+              possibleNextSample.data.timestamp || possibleNextSample.data.packetTimestamp,
+            ).getTime() - convertTimestampToDate(sample.data.timestamp || sample.data.packetTimestamp).getTime();
 
           if (sampleElapsed >= elapsed) {
             break;
@@ -305,17 +306,19 @@ const useInesStore = create<State>((set, get) => ({
     let bufferCurrentDate: Date | null = null;
 
     if (sample.type === "frame") {
-      bufferCurrentDate = convertTimestampToDate(sample.data.timestamp);
+      bufferCurrentDate = new Date(sample.createdAt);
     }
 
     set((state) => ({
       ...stateChanges,
       bufferCurrentDate: bufferCurrentDate || state.bufferCurrentDate,
-      match: bufferCurrentDate &&
-        state.match && {
-          ...state.match,
-          duration: bufferCurrentDate.getTime() - state.match.startedAt.getTime(),
-        },
+      match:
+        bufferCurrentDate && state.match
+          ? {
+              ...state.match,
+              duration: bufferCurrentDate.getTime() - state.match.startedAt.getTime(),
+            }
+          : state.match,
     }));
   },
 }));
