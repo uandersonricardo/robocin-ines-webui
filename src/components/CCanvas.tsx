@@ -6,8 +6,8 @@ type CanvasProps = {
   canvasWidth: number;
   canvasHeight: number;
   zoomAndPan: boolean;
-  field: Field | null;
   frame: Frame | null;
+  isPlaying: boolean;
 };
 
 const ORIGIN = Object.freeze({ x: 0, y: 0 });
@@ -28,7 +28,7 @@ function scalePoint(p1: Point, scale: number) {
 
 const ZOOM_SENSITIVITY = 500;
 
-const CCanvas: React.FC<CanvasProps> = ({ canvasWidth, canvasHeight, zoomAndPan, field, frame }) => {
+const CCanvas: React.FC<CanvasProps> = ({ canvasWidth, canvasHeight, zoomAndPan, frame, isPlaying }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [scale, setScale] = useState<number>(1);
@@ -116,11 +116,11 @@ const CCanvas: React.FC<CanvasProps> = ({ canvasWidth, canvasHeight, zoomAndPan,
   }, [context, offset, scale]);
 
   useEffect(() => {
-    if (context && field && frame) {
-      const matchFrame = new MatchFrame(frame, field, context);
+    if (context && frame && isPlaying) {
+      const matchFrame = new MatchFrame(frame, context);
       matchFrame.draw();
     }
-  }, [canvasWidth, canvasHeight, context, scale, offset, viewportTopLeft, frame, field]);
+  }, [canvasWidth, canvasHeight, context, scale, offset, viewportTopLeft, frame, isPlaying]);
 
   useEffect(() => {
     const canvasElem = canvasRef.current;

@@ -19,14 +19,14 @@ type Timestamp = {
 };
 
 type Field = {
-  id: string;
-  timestamp: Timestamp;
+  serialId: string;
   length: number;
   width: number;
   goalDepth: number;
   goalWidth: number;
   penaltyAreaDepth: number;
   penaltyAreaWidth: number;
+  boundaryWidth: number;
   goalCenterToPenaltyMark: number;
 };
 
@@ -36,17 +36,27 @@ type Team = {
   yellowCards: number;
   redCards: number;
   timeouts: number;
-  goalkeeperId: number;
+  timeoutTime: number;
+  goalkeeper: number;
+  foulCounter: number;
+  ballPlacementFailures: number;
+  canPlaceBall: boolean;
+  maxAllowedBots: number;
+  botSubstitutionIntent: boolean;
+  ballPlacementFailuresReached: boolean;
 };
 
-type Status = {
-  id: string;
-  timestamp: Timestamp;
-  eventTimestamp: Timestamp;
-  homeTeam: Team;
-  awayTeam: Team;
-  command: Record<string, any>;
-  totalCommands: string;
+type Referee = {
+  packetTimestamp: string;
+  stage: string;
+  stageTimeLeft: number;
+  command: string;
+  commandCounter: number;
+  commandTimestamp: string;
+  yellow: Team;
+  blue: Team;
+  blueTeamOnPositiveHalf: boolean;
+  currentActionTimeRemaining: number;
 };
 
 type Point = {
@@ -56,22 +66,21 @@ type Point = {
 
 type Ball = {
   position: Point;
-  velocity: any;
 };
 
 type Robot = {
   id: number;
   position: Point;
   angle: number;
-  velocity: any;
+  color: "COLOR_BLUE" | "COLOR_YELLOW";
 };
 
 type Frame = {
-  id: string;
+  serialId: string;
   timestamp: Timestamp;
   ball: Ball;
-  teammates: Robot[];
-  opponents: Robot[];
+  robots: Robot[];
+  field: Field;
 };
 
 type Match = {
@@ -80,4 +89,12 @@ type Match = {
   duration: number;
 };
 
-type Chunk = any[];
+type Sample = {
+  _id: string;
+  matchId: string;
+  type: "referee" | "frame";
+  data: any;
+  createdAt: string;
+};
+
+type Chunk = Sample[];
