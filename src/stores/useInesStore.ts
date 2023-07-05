@@ -2,7 +2,6 @@ import { WebSocketLike } from "react-use-websocket/dist/lib/types";
 import { create } from "zustand";
 
 import socketIo from "@/services/socketio";
-import { convertTimestampToDate } from "@/utils/time";
 
 const refereeDefault: Referee = {
   packetTimestamp: "1688418444652110",
@@ -139,7 +138,7 @@ const frameDefault: Frame = {
 const BUFFER_SIZE = 10000;
 const PREFETCH_FREQUENCY = 8000;
 
-let lastTimestamp = Date.now();
+let lastTime = window.performance.now();
 
 type State = {
   webSocket: WebSocketLike | null;
@@ -185,7 +184,7 @@ const useInesStore = create<State>((set, get) => ({
   togglePlay: () => {
     const { isPlaying, isLive, stepBuffer, isFetching, buffer, nextSample } = get();
 
-    lastTimestamp = Date.now();
+    lastTime = window.performance.now();
     set({ isPlaying: !isPlaying });
 
     if (!isPlaying && !isLive) {
@@ -223,46 +222,41 @@ const useInesStore = create<State>((set, get) => ({
       const sample = buffer[nextSample];
       stateChanges[sample.type] = sample.data;
 
-      window.requestAnimationFrame(() => {
-        const now = Date.now();
-        const elapsed = now - lastTimestamp;
+      const now = window.performance.now();
+      const elapsed = now - lastTime;
 
-        let offset = 1;
-        while (nextSample + offset < buffer.length - 1) {
-          const possibleNextSample = buffer[nextSample + offset];
-          const sampleElapsed =
-            convertTimestampToDate(
-              possibleNextSample.data.timestamp || possibleNextSample.data.packetTimestamp,
-            ).getTime() - convertTimestampToDate(sample.data.timestamp || sample.data.packetTimestamp).getTime();
+      let offset = 1;
+      while (nextSample + offset < buffer.length - 1) {
+        const possibleNextSample = buffer[nextSample + offset];
+        const sampleElapsed = Date.parse(possibleNextSample.createdAt) - Date.parse(sample.createdAt);
 
-          if (sampleElapsed >= elapsed) {
-            break;
-          }
-
-          offset++;
+        if (sampleElapsed >= elapsed) {
+          break;
         }
 
-        const bufferCurrentDate = sample.data.timestamp
-          ? convertTimestampToDate(sample.data.timestamp)
-          : new Date(sample.createdAt);
+        offset++;
+      }
 
-        lastTimestamp = now;
+      const bufferCurrentDate = new Date(sample.createdAt);
 
-        set((state) => {
-          if (!state.isFetching && state.buffer.length - state.nextSample <= PREFETCH_FREQUENCY) {
-            stateChanges.isFetching = true;
+      lastTime = now;
 
-            const lastTimestamp = state.buffer.length ? state.buffer[state.buffer.length - 1].createdAt : null;
-            socketIo.send({ command: "get-chunk", lastTimestamp });
-          }
+      set((state) => {
+        if (!state.isFetching && state.buffer.length - state.nextSample <= PREFETCH_FREQUENCY) {
+          stateChanges.isFetching = true;
 
-          return {
-            ...stateChanges,
-            nextSample: state.nextSample + offset,
-            bufferCurrentDate: bufferCurrentDate,
-          };
-        });
+          const lastTimestamp = state.buffer.length ? state.buffer[state.buffer.length - 1].createdAt : null;
+          socketIo.send({ command: "get-chunk", lastTimestamp });
+        }
 
+        return {
+          ...stateChanges,
+          nextSample: state.nextSample + offset,
+          bufferCurrentDate: bufferCurrentDate,
+        };
+      });
+
+      window.requestAnimationFrame(() => {
         stepBuffer();
       });
     } else if (!isFetching) {
